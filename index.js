@@ -22,7 +22,7 @@ let persons = [
                 ]
 
 
-app.get('/info', (req,res) => {
+app.get('/', (req,res) => {
     res.send(`<p> Phonebook has info for ${persons.length} people</p>
             <p>${new Date(Date.now())}</p>`
     )

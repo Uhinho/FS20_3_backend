@@ -21,19 +21,7 @@ morgan.token('person', ((req) => {
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :person'))
 
 
-const errorHandler = (error, request, response, next) => {
-    console.error(error.message)
 
-    if (error.name === 'CastError') {
-        return response.status(400).send({error: 'malformatted id'})
-    } else if (error.name === 'ValidationError') {
-        return response.status(400).json({error: error.message})
-    }
-
-    next(error)
-}
-
-app.use(errorHandler)
 
 
 app.get('/', (req,res, next) => {
@@ -59,7 +47,7 @@ app.get('/api/persons/:id', (req,res, next) => {
                 res.status(404).end()
             }
         })
-        .catch(err => next(err))
+        .catch(error => next(error))
 })
 
 
@@ -79,7 +67,7 @@ app.post('/api/persons', (req,res, next) => {
         .then(savedAndFormattedPerson => {
             res.json(savedAndFormattedPerson)
         })
-        .catch(err => next(err))
+        .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (req,res, next) => {
@@ -97,15 +85,28 @@ app.delete('/api/persons/:id', (req,res, next) => {
 app.put('/api/persons/:id', (req,res, next) => {
     const id = req.params.id
     
-    Person.findByIdAndUpdate(id, {number: req.body.number}, (e) => {
-        if(e) console.log(e)
-        console.log("Succesfully updated")
-    })
+    Person.findByIdAndUpdate(id, {number: req.body.number})
     .then(p  => {
         res.json(p)
     })
     .catch(err => next(err))
 })
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({error: 'malformatted id'})
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).send({error: error.message})
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)
+
+
 
 
 const PORT = process.env.PORT

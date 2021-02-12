@@ -75,9 +75,7 @@ app.delete('/api/persons/:id', (req,res, next) => {
     if(e) console.log(e)
     console.log('Successfully deleted')
   })
-    .then(res => {
-      res.status(204).end()
-    })
+    .then(p => res.json(p))
     .catch(err => next(err))
 })
 
